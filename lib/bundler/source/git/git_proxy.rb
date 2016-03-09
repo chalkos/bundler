@@ -84,6 +84,7 @@ module Bundler
         end
 
         def checkout
+          return unless allow_remote?
           if path.exist?
             return if has_revision_cached?
             Bundler.ui.info "Fetching #{uri}"
@@ -199,9 +200,17 @@ module Bundler
           @git ? @git.allow_git_ops? : true
         end
 
+        def allow_remote?
+          @git ? @git.allow_git_remote_ops? : true
+        end
+
         def in_path(&blk)
           checkout unless path.exist?
-          SharedHelpers.chdir(path, &blk)
+          if path.exist?
+            SharedHelpers.chdir(path, &blk)
+          else
+            raise GitError, "The git source #{uri} is not yet checked out. Please run `bundle install` before trying to start your application"
+          end
         end
 
         def allowed_in_path

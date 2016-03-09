@@ -144,7 +144,7 @@ describe "bundle cache" do
     end
 
     it "still works" do
-      bundle :cache
+      bundle "cache --all"
 
       system_gems []
       bundle "install --local"
